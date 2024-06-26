@@ -1,0 +1,76 @@
+from flask import Flask, render_template, request
+# from model import Model, DecoderType
+# from main import infer, char_list_from_file
+from predict import predict
+
+ 
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('design.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+
+@app.route('/submit_image', methods=['POST','GET'])
+#def submitForm():
+    #if(request.method == 'POST'):
+      #  img = request.files['image']
+       # path = 'S1005L01.jpg"'
+        # img.save(path)
+       # res = predict(path)
+    #return render_template('design.html',res=res, image_path='input.png')
+        #img = request.files['image']
+       # img.save('uploaded_image.jpg')  # Save the uploaded image
+       # res = predict('uploaded_image.jpg')  # Call the predict function with the path of the uploaded image
+        #return render_template('design.html', res=res, image_path='uploaded_image.jpg')
+    #return render_template('design.html')
+def submitForm():
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'image' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        img = request.files['image']
+        path='uploaded_image.jpg'
+        # If the user does not select a file, the browser submits an empty file without a filename
+        if img.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if img:
+            img.save(os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded_image.jpg'))  # Save the uploaded image
+            res = predict(os.path.join(app.config['UPLOAD_FOLDER'], 'uploaded_image.jpg'))  # Call the predict function with the path of the uploaded image
+            return render_template('design.html', res=res, image_path='uploaded_image.jpg')
+    return render_template('design.html')
+
+
+if __name__ == '__main__':
+    app.run()
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".png, .jpg, .jpeg">
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>
+
